@@ -32,43 +32,45 @@ export function HomeView({
     <motion.section
       layout
       transition={{ duration: 0.6, ease: premiumEase }}
-      className={`relative flex flex-col items-center justify-center ${
+      className={`relative flex flex-col items-center ${
         compact
           ? 'pb-16 pt-8'
-          : 'min-h-[calc(100dvh-4rem)] pb-24 pt-8'
+          : 'min-h-[calc(100dvh-4rem)] justify-start pb-24 pt-6 sm:pt-8'
       }`}
     >
-      {/* Hero copy — positioned at the top so the sphere can sit centered. */}
+      {/* Hero copy — pinned at the top center, near the logo. */}
       <motion.div
         layout
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7, ease: premiumEase, delay: 0.1 }}
         className={`relative z-10 max-w-3xl px-5 text-center sm:px-8 ${
-          compact ? 'mb-2' : 'absolute inset-x-0 top-6 mx-auto sm:top-10'
+          compact ? 'mb-2' : 'mb-2'
         }`}
       >
         <p
           className={`font-semibold uppercase tracking-[0.2em] text-gold-light transition-all ${
-            compact ? 'text-xs' : 'mb-4 text-xs sm:text-sm'
+            compact ? 'text-xs' : 'mb-3 text-xs sm:text-sm'
           }`}
         >
           {t('hero.eyebrow')}
         </p>
         {!compact && (
-          <h1 className="font-display text-display-xl font-extrabold leading-[1.02] tracking-tight text-white text-balance">
+          <h1 className="font-display text-display-lg font-extrabold leading-[1.04] tracking-tight text-white text-balance">
             {t('hero.title')}
           </h1>
         )}
       </motion.div>
 
-      {/* WebGL sphere — vertically centered in the hero. */}
+      {/* WebGL sphere — sits below the title, filling remaining space. */}
       <motion.div
         layout
         initial={{ opacity: 0, scale: 0.92 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1, ease: premiumEase, delay: 0.2 }}
-        className="relative z-10 flex items-center justify-center"
+        className={`relative z-10 flex items-center justify-center ${
+          compact ? '' : 'flex-1'
+        }`}
       >
         <SphereNavigation
           onSelect={onSelect}
