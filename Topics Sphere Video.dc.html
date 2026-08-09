@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; height: 100%; }
+  @keyframes ts-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+  @keyframes ts-shadow { 0%, 100% { opacity: 0.45; transform: translateX(-50%) scaleX(1); } 50% { opacity: 0.3; transform: translateX(-50%) scaleX(0.9); } }
+</style>
+</helmet>
+<div style="height: 100%; width: 100%; position: relative; font-family: Space Grotesk; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; box-sizing: border-box; overflow: hidden; color: #FFFFFF; font-size: 20px; text-align: center">
+  <div style="position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 30%, #0d1a3d 0%, #060a1c 55%, #020308 100%); z-index: 0;"></div>
+  <canvas ref="{{ bgCanvasRef }}" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0;"></canvas>
+  <div style="width:min(74vh,640px,88vw);aspect-ratio:1/1;position:relative;z-index:1;animation:ts-float 8s ease-in-out infinite;">
+    <div ref="{{ mountRef }}" style="width: 100%; height: 100%; position: absolute; inset: 0;"></div>
+    <div ref="{{ labelsRef }}" style="position: sticky; inset: 0; overflow: visible; left: 30px; top: -41px; pointer-events: none;"></div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;backgroundTone&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;light grey&quot;,&quot;options&quot;:[&quot;white&quot;,&quot;light grey&quot;],&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Style&quot;},&quot;autoRotate&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sphere&quot;},&quot;autoRotateSpeed&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.9,&quot;min&quot;:0,&quot;max&quot;:3,&quot;step&quot;:0.1,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Sphere&quot;},&quot;showConnections&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sphere&quot;}}">
+const TOPIC_GROUPS = [
+  ['Mother','Father','Parents','Children','Marriage','Husband','Wife','Family relations'],
+  ['Friendship','Neighbors','Respect','Kindness','Forgiveness','Honesty','Trust'],
+  ['Responsibility','Discipline','Patience','Gratitude','Humility','Self-control','Time management'],
+  ['Hard work','Earning halal income','Excellence (Ihsan)','Leadership','Justice','Fairness','Knowledge'],
+  ['Stress','Anxiety','Hope','Sadness','Anger','Fear','Depression','Motivation'],
+  ['Helping others','Charity','Community','Respect for people','Keeping promises','Good manners'],
+  ['Sports','Physical strength','Cleanliness','Healthy lifestyle','Sleep','Eating'],
+  ['Prayer','Tawakkul','Sincerity','Repentance','Dua','Dhikr','Faith','Taqwa']
+];
+const TOPICS = TOPIC_GROUPS.flat();
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector('script[data-ts-src="' + src + '"]')) { resolve(); return; }
+    const s = document.createElement('script');
+    s.src = src;
+    s.dataset.tsSrc = src;
+    s.onload = resolve;
+    s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
+
+function fibonacciSphere(n, radius) {
+  const pts = [];
+  const phi = Math.PI * (3 - Math.sqrt(5));
+  for (let i = 0; i < n; i++) {
+    const y = 1 - (i / (n - 1)) * 2;
+    const r = Math.sqrt(1 - y * y);
+    const theta = phi * i;
+    pts.push({ x: Math.cos(theta) * r * radius, y: y * radius, z: Math.sin(theta) * r * radius });
+  }
+  return pts;
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.mountRef = React.createRef();
+    this.labelsRef = React.createRef();
+    this.bgCanvasRef = React.createRef();
+  }
+
+  async componentDidMount() {
+    this.initBgCanvas();
+    try {
+      await loadScript('https://unpkg.com/three@0.128.0/build/three.min.js');
+      await loadScript('https://unpkg.com/three@0.128.0/examples/js/controls/OrbitControls.js');
+    } catch (e) {
+      console.error('Failed to load three.js', e);
+      return;
+    }
+    if (!this.mountRef.current) return;
+    this.initScene();
+  }
+
+  initBgCanvas() {
+    const canvas = this.bgCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let w, h, dpr;
+    const stars = [];
+    const glows = [];
+    const resize = () => {
+      dpr = Math.min(window.devicePixelRatio, 2);
+      w = canvas.clientWidth; h = canvas.clientHeight;
+      canvas.width = w * dpr; canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    this._onBgResize = resize;
+    window.addEventListener('resize', resize);
+    resize();
+    for (let i = 0; i < 220; i++) {
+      stars.push({ x: Math.random(), y: Math.random(), r: Math.random() * 1.3 + 0.2, phase: Math.random() * Math.PI * 2, speed: 0.4 + Math.random() * 0.8 });
+    }
+    for (let i = 0; i < 4; i++) {
+      glows.push({ x: Math.random(), y: Math.random(), r: 0.25 + Math.random() * 0.2, vx: (Math.random() - 0.5) * 0.00006, vy: (Math.random() - 0.5) * 0.00006 });
+    }
+    const animate = (t) => {
+      this._bgRaf = requestAnimationFrame(animate);
+      ctx.clearRect(0, 0, w, h);
+      glows.forEach(g => {
+        g.x += g.vx; g.y += g.vy;
+        if (g.x < 0 || g.x > 1) g.vx *= -1;
+        if (g.y < 0 || g.y > 1) g.vy *= -1;
+        const cx = g.x * w, cy = g.y * h, rad = g.r * Math.max(w, h);
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rad);
+        grad.addColorStop(0, 'rgba(70,110,255,0.10)');
+        grad.addColorStop(1, 'rgba(70,110,255,0)');
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, w, h);
+      });
+      stars.forEach(s => {
+        const tw = 0.55 + 0.45 * Math.sin(t * 0.001 * s.speed + s.phase);
+        ctx.beginPath();
+        ctx.fillStyle = 'rgba(255,255,255,' + (tw * 0.85) + ')';
+        ctx.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      });
+    };
+    this._bgRaf = requestAnimationFrame(animate);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._onResize);
+    window.removeEventListener('resize', this._onBgResize);
+    if (this._raf) cancelAnimationFrame(this._raf);
+    if (this._bgRaf) cancelAnimationFrame(this._bgRaf);
+    if (this._renderer) this._renderer.dispose();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this._controls && prevProps.autoRotate !== this.props.autoRotate) {
+      this._controls.autoRotate = this.props.autoRotate ?? true;
+    }
+    if (this._controls && prevProps.autoRotateSpeed !== this.props.autoRotateSpeed) {
+      this._controls.autoRotateSpeed = this.props.autoRotateSpeed ?? 0.9;
+    }
+    if (this._lines && prevProps.showConnections !== this.props.showConnections) {
+      this._lines.visible = this.props.showConnections ?? true;
+      if (this._topicLines) this._topicLines.visible = this.props.showConnections ?? true;
+    }
+  }
+
+  initScene() {
+    const THREE = window.THREE;
+    const mount = this.mountRef.current;
+    const labelsHost = this.labelsRef.current;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+    camera.position.set(0, 0.25, 4.6);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setClearColor(0x000000, 0);
+    mount.appendChild(renderer.domElement);
+    this._renderer = renderer;
+
+    const group = new THREE.Group();
+    scene.add(group);
+
+    // dense dust
+    const dustN = 2200;
+    const dustPos = new Float32Array(dustN * 3);
+    fibonacciSphere(dustN, 1).forEach((p, i) => {
+      const jitter = 0.97 + Math.random() * 0.1;
+      dustPos[i * 3] = p.x * jitter;
+      dustPos[i * 3 + 1] = p.y * jitter;
+      dustPos[i * 3 + 2] = p.z * jitter;
+    });
+    const dustGeo = new THREE.BufferGeometry();
+    dustGeo.setAttribute('position', new THREE.BufferAttribute(dustPos, 3));
+    const dustMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.012, transparent: true, opacity: 0.5, sizeAttenuation: true });
+    const dust = new THREE.Points(dustGeo, dustMat);
+    group.add(dust);
+
+    // node points + constellation lines
+    const nodeN = 150;
+    const nodePts = fibonacciSphere(nodeN, 1.04);
+    const nodePos = new Float32Array(nodeN * 3);
+    nodePts.forEach((p, i) => { nodePos[i * 3] = p.x; nodePos[i * 3 + 1] = p.y; nodePos[i * 3 + 2] = p.z; });
+    const nodeGeo = new THREE.BufferGeometry();
+    nodeGeo.setAttribute('position', new THREE.BufferAttribute(nodePos, 3));
+    const nodeMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.028, transparent: true, opacity: 0.9, sizeAttenuation: true });
+    const nodes = new THREE.Points(nodeGeo, nodeMat);
+    group.add(nodes);
+
+    const linePositions = [];
+    for (let i = 0; i < nodeN; i++) {
+      const a = nodePts[i];
+      const dists = [];
+      for (let j = 0; j < nodeN; j++) {
+        if (i === j) continue;
+        const b = nodePts[j];
+        const d = (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2;
+        dists.push([d, j]);
+      }
+      dists.sort((x, y) => x[0] - y[0]);
+      for (let k = 0; k < 2; k++) {
+        const b = nodePts[dists[k][1]];
+        linePositions.push(a.x, a.y, a.z, b.x, b.y, b.z);
+      }
+    }
+    const lineGeo = new THREE.BufferGeometry();
+    lineGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(linePositions), 3));
+    const lineMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.18 });
+    const lines = new THREE.LineSegments(lineGeo, lineMat);
+    lines.visible = this.props.showConnections ?? true;
+    group.add(lines);
+    this._lines = lines;
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.06;
+    controls.enableZoom = false;
+    controls.enablePan = false;
+    controls.autoRotate = this.props.autoRotate ?? true;
+    controls.autoRotateSpeed = this.props.autoRotateSpeed ?? 0.9;
+    this._controls = controls;
+
+    // floating topic labels
+    const labelRadius = 1.32;
+    const anchors = fibonacciSphere(TOPICS.length, labelRadius);
+
+    const topicLinePositions = [];
+    for (let i = 0; i < anchors.length; i++) {
+      const a = anchors[i];
+      const dists = [];
+      for (let j = 0; j < anchors.length; j++) {
+        if (i === j) continue;
+        const b = anchors[j];
+        const d = (a.x - b.x) ** 2 + (a.y - b.y) ** 2 + (a.z - b.z) ** 2;
+        dists.push([d, j]);
+      }
+      dists.sort((x, y) => x[0] - y[0]);
+      for (let k = 0; k < 2; k++) {
+        const b = anchors[dists[k][1]];
+        topicLinePositions.push(a.x, a.y, a.z, b.x, b.y, b.z);
+      }
+    }
+    const topicLineGeo = new THREE.BufferGeometry();
+    topicLineGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(topicLinePositions), 3));
+    const topicLineMat = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.22 });
+    const topicLines = new THREE.LineSegments(topicLineGeo, topicLineMat);
+    topicLines.visible = this.props.showConnections ?? true;
+    group.add(topicLines);
+    this._topicLines = topicLines;
+    const labelEls = TOPICS.map((text, i) => {
+      const el = document.createElement('div');
+      el.textContent = text;
+      el.style.position = 'absolute';
+      el.style.left = '0';
+      el.style.top = '0';
+      el.style.fontWeight = '400';
+      el.style.color = '#ffffff';
+      el.style.fontFamily = "'Manrope', sans-serif";
+      el.style.letterSpacing = '-0.01em';
+      el.style.whiteSpace = 'nowrap';
+      el.style.pointerEvents = 'none';
+      el.style.willChange = 'transform, opacity';
+      labelsHost.appendChild(el);
+      return { el, text, pos: new THREE.Vector3(anchors[i].x, anchors[i].y, anchors[i].z) };
+    });
+
+    const resize = () => {
+      const w = mount.clientWidth, h = mount.clientHeight;
+      if (!w || !h) return;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    };
+    this._onResize = resize;
+    window.addEventListener('resize', resize);
+    resize();
+
+    const v = new THREE.Vector3();
+    const camDir = new THREE.Vector3();
+    const animate = () => {
+      this._raf = requestAnimationFrame(animate);
+      controls.update();
+      const w = mount.clientWidth, h = mount.clientHeight;
+      camDir.copy(camera.position).normalize();
+      const marginX = w * 0.09, marginY = h * 0.09;
+      const computed = labelEls.map(({ el, pos, text }) => {
+        v.copy(pos).applyMatrix4(group.matrixWorld);
+        const facing = pos.clone().normalize().dot(camDir);
+        v.project(camera);
+        const x = (v.x * 0.5 + 0.5) * w;
+        const y = (-v.y * 0.5 + 0.5) * h;
+        const t = (facing + 1) / 2;
+        let opacity = Math.max(0.08, Math.min(1, 0.1 + t * 0.9));
+        const edgeX = Math.max(0, Math.max(marginX - x, x - (w - marginX)) / marginX);
+        const edgeY = Math.max(0, Math.max(marginY - y, y - (h - marginY)) / marginY);
+        const edgeFade = Math.max(0, 1 - Math.max(edgeX, edgeY) * 1.4);
+        opacity *= edgeFade;
+        const scale = 0.55 + t * 0.45;
+        const fontSize = Math.max(9, 13 * scale);
+        const halfW = text.length * fontSize * 0.34;
+        const halfH = fontSize * 0.75;
+        return { el, x, y, t, opacity, fontSize, halfW, halfH };
+      });
+      computed.sort((a, b) => b.t - a.t);
+      const placed = [];
+      computed.forEach(l => {
+        const hit = placed.some(p =>
+          Math.abs(l.x - p.x) < (l.halfW + p.halfW) * 1.0 &&
+          Math.abs(l.y - p.y) < (l.halfH + p.halfH) * 1.0
+        );
+        if (hit) l.opacity *= 0.04;
+        else placed.push(l);
+        l.el.style.transform = 'translate(-50%, -50%) translate(' + l.x + 'px,' + l.y + 'px)';
+        l.el.style.opacity = l.opacity;
+        l.el.style.fontSize = l.fontSize + 'px';
+        l.el.style.zIndex = Math.round(l.t * 100);
+      });
+      renderer.render(scene, camera);
+    };
+    animate();
+  }
+
+  renderVals() {
+    const bgChoice = this.props.backgroundTone ?? 'light grey';
+    const pageBg = bgChoice === 'white' ? '#ffffff' : '#f2f2ef';
+    return { pageBg, mountRef: this.mountRef, labelsRef: this.labelsRef, bgCanvasRef: this.bgCanvasRef };
+  }
+}
+
+</script>
+</body>
+</html>

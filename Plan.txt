@@ -1,0 +1,582 @@
+# Project Plan: Ilim Web App
+
+## Project Name
+
+**Ilim**
+
+Ilim is not primarily a software project—it is a curated digital library of authentic Islamic guidance.
+
+## Goal
+
+Create a modern, minimalistic one-page web application that helps people find authentic Islamic guidance for everyday life.
+
+The application should support **three languages**:
+
+* 🇬🇧 English
+* 🇷🇺 Russian
+* 🇰🇿 Kazakh
+
+All content must be available in all three languages.
+
+---
+
+# Main Idea
+
+The homepage displays a large interactive sphere (or circular navigation) where each section represents a life topic.
+
+Users click a topic.
+
+The application then displays Islamic guidance in the following order:
+
+### 1. Quran
+
+Relevant Quran verses.
+
+### 2. Hadith
+
+Authentic hadith related to the topic.
+
+### 3. Islamic Scholars & Historical Figures
+
+Quotes from respected Islamic personalities such as:
+
+* Umar ibn Al-Khattab
+* Ali ibn Abi Talib
+* Imam Ash-Shafi'i
+* Imam Ahmad ibn Hanbal
+* Ibn Taymiyyah
+* Hasan Al-Basri
+* Ibn Al-Qayyim
+* Imam Al-Ghazali
+* Other authentic scholars
+
+Every quote must include the original source whenever possible.
+
+---
+
+# Categories
+
+Start with these categories.
+
+## Family
+
+* Mother
+* Father
+* Parents
+* Children
+* Marriage
+* Husband
+* Wife
+* Family relations
+
+## Relationships
+
+* Friendship
+* Neighbors
+* Respect
+* Kindness
+* Forgiveness
+* Honesty
+* Trust
+
+## Personal Development
+
+* Responsibility
+* Discipline
+* Patience
+* Gratitude
+* Humility
+* Self-control
+* Time management
+
+## Work & Success
+
+* Hard work
+* Earning halal income
+* Excellence (Ihsan)
+* Leadership
+* Justice
+* Fairness
+* Knowledge
+
+## Mental & Emotional Well-being
+
+* Stress
+* Anxiety
+* Hope
+* Sadness
+* Anger
+* Fear
+* Depression
+* Motivation
+
+## Society
+
+* Helping others
+* Charity
+* Community
+* Respect for people
+* Keeping promises
+* Good manners
+
+## Health
+
+* Sports
+* Physical strength
+* Cleanliness
+* Healthy lifestyle
+* Sleep
+* Eating
+
+## Spirituality
+
+* Prayer
+* Tawakkul
+* Sincerity
+* Repentance
+* Dua
+* Dhikr
+* Faith
+* Taqwa
+
+---
+
+# User Flow
+
+## Step 1
+
+User opens the website.
+
+---
+
+## Step 2
+
+A beautiful animated sphere appears in the center.
+
+Each section of the sphere represents one topic.
+
+Example:
+
+○ Friendship
+
+○ Family
+
+○ Stress
+
+○ Responsibility
+
+○ Work
+
+○ Sport
+
+○ Justice
+
+○ Knowledge
+
+○ Prayer
+
+...
+
+Hover animation.
+
+Smooth transitions.
+
+Responsive on desktop and mobile.
+
+---
+
+## Step 3
+
+User clicks a topic.
+
+The sphere smoothly moves upward or shrinks.
+
+The content section opens.
+
+---
+
+## Step 4
+
+Display information in this exact order.
+
+# Quran
+
+Show 3–10 relevant verses.
+
+Each verse should contain:
+
+* Arabic text (optional for MVP)
+* Translation
+* Surah name
+* Verse number
+
+---
+
+# Hadith
+
+Show authentic hadith.
+
+Each hadith contains:
+
+* Text
+* Collection (Bukhari, Muslim, Tirmidhi, etc.)
+* Reference number
+
+---
+
+# Islamic Scholars
+
+Display meaningful quotations from respected Islamic scholars and historical figures.
+
+Each quote includes:
+
+* Person
+* Quote
+* Source
+
+---
+
+# Design
+
+Style:
+
+* Modern
+* Minimalistic
+* Calm
+* Elegant
+* Premium
+
+Colors:
+
+* White
+* Soft green
+* Emerald
+* Gold accents
+* Dark mode support
+
+Typography:
+
+* Clean readable fonts
+* Beautiful spacing
+
+Animations:
+
+* Smooth
+* Soft
+* No excessive effects
+
+---
+
+# Language Support
+
+The language selector should always be visible.
+
+Supported languages:
+
+* English
+* Russian
+* Kazakh
+
+Changing the language should instantly translate:
+
+* Interface
+* Categories
+* Quran translations
+* Hadith translations
+* Scholar quotes
+
+---
+
+# Technical Stack
+
+Frontend:
+
+* Next.js
+* React
+* TypeScript
+* Tailwind CSS
+* Framer Motion
+
+Icons:
+
+* Lucide React
+
+Internationalization:
+
+* next-intl
+
+Data:
+
+* JSON files initially
+
+Later:
+
+* PostgreSQL
+* Prisma ORM
+
+Deployment:
+
+* Vercel
+
+---
+
+# Data Structure
+
+Each topic should follow a consistent structure:
+
+```json
+{
+  "id": "friendship",
+  "title": {
+    "en": "Friendship",
+    "ru": "Дружба",
+    "kk": "Достық"
+  },
+  "quran": [],
+  "hadith": [],
+  "quotes": []
+}
+```
+
+---
+
+# Future Features
+
+* Search by keyword
+* Favorite quotes
+* Daily Islamic reminder
+* Random quote
+* Share quote as image
+* Bookmark topics
+* User accounts
+* Admin dashboard for managing content
+* AI-powered recommendations
+* Progressive Web App (PWA)
+* Offline mode
+
+---
+
+# Important Rules
+
+* Use only authentic Quran verses.
+* Use authentic hadith whenever possible.
+* Clearly identify the source of every hadith.
+* Clearly identify the source of every scholar quote.
+* Never invent or paraphrase Islamic sources without indicating that it is a paraphrase.
+* Content should inspire practical application in daily life while remaining faithful to authentic Islamic teachings.
+* Organize topics so users can quickly find guidance for real-life situations.
+
+---
+
+# Development Roadmap
+
+## Phase 1
+
+* Create the Next.js project.
+* Set up Tailwind CSS.
+* Configure multilingual support (English, Russian, Kazakh).
+* Build the one-page layout.
+
+## Phase 2
+
+* Create the interactive spherical navigation.
+* Add responsive animations and transitions.
+* Implement topic selection.
+
+## Phase 3
+
+* Build reusable content components for Quran, Hadith, and Scholar Quotes.
+* Create the JSON data structure.
+* Load content dynamically based on the selected topic and language.
+
+## Phase 4
+
+* Polish the UI/UX.
+* Add dark mode.
+* Optimize performance and accessibility.
+* Deploy to Vercel.
+
+## Long-Term Roadmap
+
+* Migrate content to PostgreSQL with Prisma.
+* Build an admin panel for managing multilingual content.
+* Add search, favorites, user accounts, AI recommendations, and PWA support.
+
+Additional Design & UI Requirements
+Design Philosophy
+
+The Ilim web application should feel like a premium digital knowledge platform that combines modern scientific aesthetics with the beauty and tranquility of Islamic art.
+
+The design must immediately inspire users to explore and reflect. Every interaction should feel smooth, elegant, and intentional.
+
+Avoid clutter, excessive decorations, or overly traditional styles. The interface should be timeless, clean, and highly professional.
+
+Color Palette
+Background
+Primary: Pure White (#FFFFFF)
+Secondary: Very Light Gray (#F5F6F8)
+Cards: White
+Borders: Soft Gray
+
+The application should feel bright, open, and minimal.
+
+Accent Colors
+
+The primary accent color should be Elegant Gold.
+
+Use gold for:
+
+Quran verses
+Hadith titles
+Scholar quote headings
+Icons
+Active navigation elements
+Hover effects
+Important highlights
+
+Suggested gold tones:
+
+#C9A227
+#D4AF37
+#B8860B
+
+Gold should be used tastefully to create a premium, refined appearance rather than an overly decorative one.
+
+Text Colors
+
+Primary text:
+
+Dark Charcoal (#222222)
+
+Secondary text:
+
+Gray (#666666)
+
+Quotes:
+
+Elegant Gold
+
+References:
+
+Soft Gray
+Typography
+
+The application should feel like reading a premium digital encyclopedia.
+
+Use modern, highly readable fonts such as:
+
+Inter
+Manrope
+IBM Plex Sans
+Source Sans Pro
+
+Titles should be bold and elegant.
+
+Body text should be comfortable to read with generous spacing and a clear visual hierarchy.
+
+Overall Style
+
+The website should communicate:
+
+Knowledge
+Wisdom
+Peace
+Trust
+Authenticity
+Professionalism
+Simplicity
+
+It should resemble a modern educational or scientific platform rather than a typical religious website.
+
+User Experience
+
+Every interaction should be smooth.
+
+Include:
+
+Soft fade transitions
+Smooth scrolling
+Elegant hover animations
+Responsive micro-interactions
+High-quality loading animations
+
+Avoid flashy or distracting effects.
+
+Animations should enhance usability without overwhelming the user.
+
+Homepage
+
+The homepage should immediately capture attention.
+
+At the center of the page, display a beautiful interactive spherical navigation representing life topics.
+
+The sphere should have:
+
+Smooth 3D-like motion
+Soft shadows
+Clean geometry
+Subtle depth
+Elegant hover effects
+Fluid animations
+
+It should look like an intelligent "knowledge universe," inviting users to explore.
+
+Content Layout
+
+After selecting a topic, display the content in premium information cards.
+
+Each section (Quran, Hadith, Scholar Quotes) should have its own card with:
+
+Rounded corners
+Soft shadows
+Plenty of white space
+Elegant separators
+Smooth appearance animations
+
+The content should be easy to scan while remaining visually engaging.
+
+Scientific & Modern Feel
+
+The interface should resemble products from companies like Apple, Notion, Linear, or Stripe, combined with subtle geometric elements inspired by Islamic design.
+
+Use:
+
+Grid-based layouts
+Clean spacing
+Minimal icons
+Precise alignment
+Consistent typography
+Excellent readability
+
+Avoid ornamental excess. The design should feel intelligent, contemporary, and meticulously crafted.
+
+Mobile Experience
+
+The application must be fully responsive.
+
+On mobile:
+
+The spherical navigation should remain intuitive and interactive.
+Text should be easily readable without zooming.
+Cards should adapt seamlessly to smaller screens.
+Touch interactions should be smooth and responsive.
+Accessibility
+
+The application should prioritize accessibility by:
+
+Maintaining excellent color contrast.
+Using scalable typography.
+Supporting keyboard navigation.
+Including proper semantic HTML and ARIA labels where appropriate.
+Final Design Goal
+
+When a user visits Ilim, the first impression should be:
+
+"This feels like a premium digital library of Islamic wisdom."
+
+The interface should inspire confidence, curiosity, and reflection, encouraging users to return regularly for authentic guidance on everyday life while enjoying a polished, world-class user experience.
+
+
+
+
+
