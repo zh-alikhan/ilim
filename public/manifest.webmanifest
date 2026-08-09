@@ -1,0 +1,11 @@
+{
+  "name": "Ilim — Authentic Islamic Knowledge",
+  "short_name": "Ilim",
+  "description": "A curated digital library of authentic Islamic guidance for everyday life.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#FFFFFF",
+  "lang": "en",
+  "icons": []
+}

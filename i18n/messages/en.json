@@ -1,0 +1,54 @@
+{
+  "brand": {
+    "name": "Ilim",
+    "tagline": "A library of authentic Islamic guidance for everyday life"
+  },
+  "hero": {
+    "eyebrow": "Authentic knowledge, beautifully organized",
+    "title": "Explore the universe of Islamic knowledge",
+    "subtitle": "Fifty-seven topics for everyday life, each grounded in the Quran, authentic hadith, and the words of respected scholars.",
+    "hint": "Select a topic to begin",
+    "hintTouch": "Tap a topic to begin",
+    "browse": "Browse all topics"
+  },
+  "nav": {
+    "home": "Home",
+    "topics": "Topics",
+    "about": "About",
+    "back": "Back to sphere",
+    "close": "Close"
+  },
+  "sections": {
+    "quran": "Quran",
+    "hadith": "Hadith",
+    "scholars": "Words of Scholars",
+    "lessons": "Practical Lessons"
+  },
+  "sectionsSub": {
+    "quran": "Verses from the Book of Allah",
+    "hadith": "Sayings of the Prophet ﷺ",
+    "scholars": "Reflections from respected scholars",
+    "lessons": "Editorial summaries derived from the sources above"
+  },
+  "content": {
+    "verse": "Verse",
+    "collection": "Collection",
+    "grade": "Grade",
+    "source": "Source",
+    "editorialNote": "These lessons are editorial summaries derived from the sources above, not independent religious rulings."
+  },
+  "language": {
+    "label": "Language",
+    "select": "Select language"
+  },
+  "categories": {
+    "all": "All"
+  },
+  "footer": {
+    "disclaimer": "Ilim is an educational library. All Quran verses use established translations; hadith are graded where known; scholar quotations are attributed to their sources. No content has been fabricated.",
+    "rights": "Built as a space for learning."
+  },
+  "search": {
+    "placeholder": "Search topics"
+  }
+}

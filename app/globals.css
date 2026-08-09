@@ -1,0 +1,177 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-manrope: 'Manrope', system-ui, sans-serif;
+    --font-inter: 'Inter', system-ui, sans-serif;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-canvas text-ink font-sans antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  /* Consistent, visible focus states for keyboard users */
+  :focus-visible {
+    @apply outline-none ring-2 ring-gold ring-offset-2 ring-offset-canvas;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background-color: rgba(201, 162, 39, 0.18);
+    color: #1a1a1a;
+  }
+
+  /* Thin, unobtrusive scrollbar */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #d8dbe0 transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: #d8dbe0;
+    border-radius: 8px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+@layer components {
+  /* Emphasis rendering for preserved KB markdown (bold / italic) */
+  .kb-rich em,
+  .kb-rich i {
+    @apply not-italic text-ink;
+  }
+  .kb-rich strong,
+  .kb-rich b {
+    @apply font-semibold text-ink;
+  }
+
+  /* Gold hairline used as a section accent */
+  .rule-gold {
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      rgba(201, 162, 39, 0) 0%,
+      rgba(201, 162, 39, 0.5) 15%,
+      rgba(201, 162, 39, 0.5) 85%,
+      rgba(201, 162, 39, 0) 100%
+    );
+  }
+
+  /*
+   * Dark content theme — applied on the space background.
+   * Remaps the light-theme utility colors used by the content components
+   * to legible values over the deep-space gradient, and turns solid white
+   * cards into translucent "glass" surfaces. Scoped so components stay
+   * theme-agnostic and this stays easily reversible.
+   */
+  .dark-content {
+    color: #e8eaf0;
+  }
+  .dark-content .text-ink {
+    color: #f4f6fb !important;
+  }
+  .dark-content .text-ink-soft {
+    color: #c3c8d4 !important;
+  }
+  .dark-content .text-ink-muted {
+    color: #8b93a7 !important;
+  }
+  /* Card & surface backgrounds → translucent glass */
+  .dark-content .bg-card {
+    background-color: rgba(255, 255, 255, 0.04) !important;
+    backdrop-filter: blur(8px);
+  }
+  .dark-content .bg-mist\/50,
+  .dark-content .bg-mist\/40 {
+    background-color: rgba(255, 255, 255, 0.03) !important;
+  }
+  /* Borders → subtle light hairlines */
+  .dark-content .border-line,
+  .dark-content .border-line\/60 {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+  .dark-content .border-line-soft {
+    border-color: rgba(255, 255, 255, 0.07) !important;
+  }
+  /* Quran verse card → deep gold-tinted glass instead of near-white */
+  .dark-content .bg-gold-faint {
+    background-color: rgba(201, 162, 39, 0.08) !important;
+  }
+  .dark-content .bg-gold-wash {
+    background-color: rgba(201, 162, 39, 0.14) !important;
+  }
+  /* Section-icon tiles and gold-deep labels brighten for contrast */
+  .dark-content .text-gold-deep {
+    color: #e3c05a !important;
+  }
+  /* Emphasis inside rich text should be light, not near-black */
+  .dark-content .kb-rich strong,
+  .dark-content .kb-rich b,
+  .dark-content .kb-rich em,
+  .dark-content .kb-rich i {
+    color: #ffffff !important;
+  }
+  /* Card hover shadows are invisible on dark → use a soft light ring */
+  .dark-content .shadow-soft {
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  /* Perspective container for the CSS-3D sphere */
+  .scene-3d {
+    perspective: 1400px;
+    perspective-origin: 50% 50%;
+  }
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+}
+
+/* Gentle twinkle for the sphere's ambient starfield (opacity only, so the
+   per-star translate set inline is preserved). */
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* Respect reduced-motion globally: neutralize non-essential animation */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
