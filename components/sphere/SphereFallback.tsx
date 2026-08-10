@@ -1,6 +1,7 @@
 'use client';
 
 import { useLocale } from '@/components/layout/LocaleProvider';
+import { contentLocaleFor } from '@/hooks/useContentLocale';
 import { getGroupedTopics } from '@/lib/content';
 import { getCategoryVisual } from '@/lib/categories';
 
@@ -15,6 +16,7 @@ export function SphereFallback({
   onSelect: (id: string) => void;
 }) {
   const { locale } = useLocale();
+  const cl = contentLocaleFor(locale);
   const grouped = getGroupedTopics();
 
   return (
@@ -29,7 +31,7 @@ export function SphereFallback({
                 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-gold-deep"
               >
                 <Icon className="h-4 w-4" aria-hidden />
-                {category.name[locale]}
+                {category.name[cl]}
               </h3>
               <ul className="flex flex-wrap gap-2">
                 {topics.map((topic) => (
@@ -39,7 +41,7 @@ export function SphereFallback({
                       onClick={() => onSelect(topic.id)}
                       className="rounded-full border border-line bg-card px-3.5 py-1.5 text-sm text-ink-soft shadow-soft transition-colors hover:border-gold/50 hover:text-ink"
                     >
-                      {topic.translations[locale].name}
+                      {topic.translations[cl].name}
                     </button>
                   </li>
                 ))}

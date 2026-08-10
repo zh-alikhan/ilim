@@ -6,6 +6,8 @@ import { AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { PageStarfield } from '@/components/layout/PageStarfield';
+import { GoogleTranslate } from '@/components/layout/GoogleTranslate';
+import { TopicDrawer } from '@/components/layout/TopicDrawer';
 import { HomeView } from '@/components/sphere/HomeView';
 import { useTopicSelection } from '@/hooks/useTopicSelection';
 
@@ -19,6 +21,7 @@ export default function Page() {
   const { view, selectedTopic, selectTopic, clearSelection } =
     useTopicSelection();
   const contentRef = useRef<HTMLDivElement>(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   // Select a topic, then smoothly scroll the content into view below the sphere.
   const handleSelect = useCallback(
@@ -57,8 +60,16 @@ export default function Page() {
       }}
     >
       <PageStarfield />
+      <GoogleTranslate />
 
-      <Header view={view} onBack={handleBack} />
+      <Header view={view} onBack={handleBack} onMenu={() => setDrawerOpen(true)} />
+
+      <TopicDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onSelect={handleSelect}
+        activeId={selectedTopic?.id ?? null}
+      />
 
       <main className="relative z-10 flex-1">
         {/* Sphere stays mounted on top; content opens below it. */}

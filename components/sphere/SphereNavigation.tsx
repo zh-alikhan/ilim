@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useLocale } from '@/components/layout/LocaleProvider';
+import { contentLocaleFor } from '@/hooks/useContentLocale';
 import { topics } from '@/lib/content';
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { usePrefersReducedMotion } from '@/hooks/usePrefersReducedMotion';
@@ -57,7 +58,7 @@ export function SphereNavigation({
     >
       <ThreeSphere
         topics={topics}
-        locale={locale}
+        locale={contentLocaleFor(locale)}
         activeId={activeId}
         onSelect={onSelect}
         onHover={onHover}

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useTranslations } from 'next-intl';
 import type { Topic } from '@/content/schema';
 import { useLocale } from '@/components/layout/LocaleProvider';
+import { contentLocaleFor } from '@/hooks/useContentLocale';
 import { getCategoryName, categories } from '@/lib/content';
 import { getCategoryVisual } from '@/lib/categories';
 import { QuranSection } from './QuranSection';
@@ -15,8 +16,9 @@ import { premiumEase } from '@/lib/motion';
 
 export function ContentPanel({ topic }: { topic: Topic }) {
   const { locale } = useLocale();
+  const cl = contentLocaleFor(locale);
   const t = useTranslations();
-  const content = topic.translations[locale];
+  const content = topic.translations[cl];
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   const category = categories.find((c) => c.id === topic.categoryId);
@@ -42,7 +44,7 @@ export function ContentPanel({ topic }: { topic: Topic }) {
           <div className="mb-3 flex items-center gap-2 text-sm font-medium text-gold-deep">
             <CategoryIcon className="h-4 w-4" aria-hidden />
             <span className="uppercase tracking-wider">
-              {getCategoryName(category, locale)}
+              {getCategoryName(category, cl)}
             </span>
           </div>
         )}
