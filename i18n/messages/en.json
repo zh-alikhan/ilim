@@ -50,5 +50,9 @@
   },
   "search": {
     "placeholder": "Search topics"
+  },
+  "drawer": {
+    "disclaimer": "Ilim is an educational library. Quran translations, hadith, and scholarly quotations are compiled from established sources and provided for learning. It is not a substitute for qualified religious guidance.",
+    "contact": "Contact us"
   }
 }

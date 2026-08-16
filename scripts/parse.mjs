@@ -67,7 +67,8 @@ function slugify(str) {
 
 /** Strip surrounding markdown emphasis and quotes for clean text fields. */
 function clean(str) {
-  return str.trim();
+  // Remove any trailing horizontal-rule separator that leaked from the source.
+  return str.replace(/\s*\n?\s*-{3,}\s*$/, '').trim();
 }
 
 /** Split the file into the three language blocks. */
@@ -187,9 +188,21 @@ function parseQuran(lines) {
     const m = line.match(/^-\s*\*\*(.+?)\*\*\s*[—-]\s*(.+)$/);
     if (m) {
       const reference = clean(m[1]);
-      // Remove wrapping *"..."* / *«...»* emphasis but keep inner text intact
       let text = clean(m[2]);
-      text = text.replace(/^\*+/, '').replace(/\*+$/, '').trim();
+      // The verse text is wrapped in italic emphasis: *"..."* optionally
+      // followed by a plain "(note)". Remove the *...* wrapper but keep the
+      // quoted verse and any trailing note intact. Strip a leading '*' and the
+      // matching '*' that closes the emphasis (which may sit mid-string before
+      // a parenthetical note), rather than only the very last character.
+      if (text.startsWith('*')) {
+        text = text.slice(1);
+        // Remove the first closing '*' (end of the emphasis run).
+        text = text.replace(/\*/, '');
+      } else {
+        // Fallback: strip any stray leading/trailing asterisks.
+        text = text.replace(/^\*+/, '').replace(/\*+$/, '');
+      }
+      text = text.trim();
       items.push({ reference, text });
     }
   }
@@ -219,6 +232,15 @@ function parseLessons(lines) {
   let buffer = null;
 
   for (const line of lines) {
+    // A horizontal-rule separator (---) ends the lessons block; never fold it
+    // into a lesson's text.
+    if (/^\s*-{3,}\s*$/.test(line)) {
+      if (buffer !== null) {
+        items.push(clean(buffer));
+        buffer = null;
+      }
+      continue;
+    }
     if (/^\d+\.\s+/.test(line)) {
       if (buffer !== null) items.push(clean(buffer));
       buffer = line.replace(/^\d+\.\s+/, '');

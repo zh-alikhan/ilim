@@ -46,42 +46,82 @@ function unwrapEmphasis(s: string): string {
 export function parseHadith(raw: string): ParsedHadith {
   const text = raw.trim();
 
-  // Find the em-dash that separates quote from source. Handle both the
-  // normal " — " and the tight "*—" variant (no leading space).
-  let dashIndex = text.indexOf(' — ');
+  // The quote is wrapped in *...* emphasis; the attribution dash comes AFTER
+  // the closing '*'. Splitting on the first " — " breaks quotes that contain
+  // an em-dash themselves (e.g. «Taqwa — here»). So we anchor the split to the
+  // closing emphasis marker when present.
+  let dashIndex = -1;
   let dashLen = 3;
-  if (dashIndex === -1) {
-    const tight = text.indexOf('—');
-    if (tight === -1) {
-      return {
-        quote: unwrapEmphasis(text),
-        source: null,
-        grade: null,
-        note: null,
-      };
+
+  if (text.startsWith('*')) {
+    // Find the closing '*' that ends the quote wrapper (skip a leading '**').
+    const searchFrom = text.startsWith('**') ? 2 : 1;
+    const closeStar = text.indexOf('*', searchFrom);
+    if (closeStar !== -1) {
+      // Look for the separator dash after the closing star.
+      const afterStar = text.slice(closeStar + 1);
+      const rel = afterStar.indexOf(' — ');
+      if (rel !== -1) {
+        dashIndex = closeStar + 1 + rel;
+        dashLen = 3;
+      } else {
+        const relTight = afterStar.indexOf('—');
+        if (relTight !== -1) {
+          dashIndex = closeStar + 1 + relTight;
+          dashLen = 1;
+        }
+      }
     }
-    dashIndex = tight;
-    dashLen = 1;
+  }
+
+  // Fallback: original behaviour for entries without the *...* wrapper.
+  if (dashIndex === -1) {
+    dashIndex = text.indexOf(' — ');
+    dashLen = 3;
+    if (dashIndex === -1) {
+      const tight = text.indexOf('—');
+      if (tight === -1) {
+        return {
+          quote: unwrapEmphasis(text),
+          source: null,
+          grade: null,
+          note: null,
+        };
+      }
+      dashIndex = tight;
+      dashLen = 1;
+    }
   }
 
   const quotePart = text.slice(0, dashIndex).trim();
   let rest = text.slice(dashIndex + dashLen).trim();
 
-  // Extract a trailing parenthetical group as grade/note.
+  // Extract trailing parenthetical groups as grade/note. Some entries carry
+  // BOTH a grade "(**Sahih**)" and a following italic note "*(explanation)*".
+  // Pull every trailing "(...)" (optionally wrapped in * *), then classify:
+  // the group containing bold is the grade; any other is the note.
   let grade: string | null = null;
   let note: string | null = null;
-  const parenMatch = rest.match(/\(([^)]*)\)\s*$/);
-  if (parenMatch) {
-    const inner = parenMatch[1].trim();
-    rest = rest.slice(0, parenMatch.index).trim();
-    // Grade is the bolded part; note is any remainder.
-    const boldMatch = inner.match(/\*\*(.+?)\*\*/);
+  const trailingParens: string[] = [];
+  // Repeatedly strip a trailing "(...)" or "*(...)*" from the end.
+  let matched = true;
+  while (matched) {
+    matched = false;
+    const m2 = rest.match(/\*?\(([^)]*)\)\*?\s*$/);
+    if (m2) {
+      trailingParens.unshift(m2[1].trim());
+      rest = rest.slice(0, m2.index).trim();
+      matched = true;
+    }
+  }
+  for (const group of trailingParens) {
+    const boldMatch = group.match(/\*\*(.+?)\*\*/);
     if (boldMatch) {
       grade = boldMatch[1].trim();
-      const remainder = inner.replace(/\*\*.+?\*\*/, '').trim();
-      note = remainder.length > 0 ? remainder : null;
-    } else {
-      note = inner;
+      const remainder = group.replace(/\*\*.+?\*\*/, '').trim();
+      if (remainder.length > 0 && !note) note = remainder;
+    } else if (!note) {
+      note = group;
     }
   }
 

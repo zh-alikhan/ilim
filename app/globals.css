@@ -175,3 +175,63 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* ------------------------------------------------------------------
+ * Google Translate suppression
+ * Kazakh is delivered via a hidden Google Translate layer. Google injects
+ * several UI chrome elements (a top banner, hover tooltips, a "Original text"
+ * pop-up bubble, and highlight styling). Hide all of it so users only ever
+ * see our own EN/RU/KZ control and clean translated text.
+ * ------------------------------------------------------------------ */
+
+/* Top banner + any skiptranslate iframe */
+.goog-te-banner-frame,
+.goog-te-banner-frame.skiptranslate,
+iframe.skiptranslate,
+.skiptranslate > iframe {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Google can push the <body> down by top:40px — keep it pinned */
+body {
+  top: 0 !important;
+  position: static !important;
+}
+
+/* The hover tooltip / balloon shown over translated words */
+.goog-tooltip,
+.goog-tooltip:hover,
+#goog-gt-tt,
+.goog-te-balloon-frame {
+  display: none !important;
+}
+
+/* The floating "Original text" pop-up (VIpgJd… ids on newer widget) */
+.VIpgJd-ZVi9od-aZ2wEe-wOHMyf,
+.VIpgJd-ZVi9od-aZ2wEe-OiiCO,
+.VIpgJd-ZVi9od-ORHb-OEVmcd,
+.VIpgJd-yAWNEb-VIpgJd-fmcmS-sn54Q,
+.VIpgJd-yAWNEb-L7lbkb,
+.jfk-bubble.gtx-bubble,
+.goog-te-spinner-pos {
+  display: none !important;
+  visibility: hidden !important;
+}
+
+/* Remove the highlight background/box-shadow Google adds to translated text */
+.goog-text-highlight {
+  background: none !important;
+  box-shadow: none !important;
+}
+
+/* Keep the widget mount itself out of view (belt-and-suspenders) */
+#google_translate_element,
+.goog-te-gadget {
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  height: 1px !important;
+  width: 1px !important;
+  overflow: hidden !important;
+}

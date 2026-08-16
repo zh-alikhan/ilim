@@ -101,6 +101,34 @@ export function GoogleTranslate() {
     }
   }, [locale]);
 
+  // Google re-injects a top banner and an "Original text" hover bubble even
+  // when hidden via CSS. Continuously strip them so no chrome ever flashes.
+  useEffect(() => {
+    const strip = () => {
+      const selectors = [
+        '.goog-te-banner-frame',
+        'iframe.skiptranslate',
+        '#goog-gt-tt',
+        '.goog-tooltip',
+        '.jfk-bubble.gtx-bubble',
+        '.goog-te-balloon-frame',
+      ];
+      selectors.forEach((sel) => {
+        document.querySelectorAll(sel).forEach((el) => {
+          (el as HTMLElement).style.display = 'none';
+        });
+      });
+      // Google offsets <body> by 40px via inline style — undo it.
+      if (document.body.style.top && document.body.style.top !== '0px') {
+        document.body.style.top = '0px';
+      }
+    };
+    strip();
+    const observer = new MutationObserver(strip);
+    observer.observe(document.body, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, []);
+
   // Hidden mount point for Google's widget (kept offscreen).
   return (
     <div

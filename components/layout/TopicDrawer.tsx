@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X, Mail } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useLocale } from '@/components/layout/LocaleProvider';
 import { contentLocaleFor } from '@/hooks/useContentLocale';
@@ -134,6 +134,20 @@ export function TopicDrawer({
                 );
               })}
             </nav>
+
+            {/* Disclaimer + contact */}
+            <div className="border-t border-white/10 px-5 py-4">
+              <p className="mb-3 text-xs leading-relaxed text-white/45">
+                {t('drawer.disclaimer')}
+              </p>
+              <a
+                href="mailto:zh.alikhan@gmail.com?subject=Ilim%20—%20Feedback"
+                className="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-gold/10 px-4 py-2 text-sm font-medium text-gold-light transition-colors hover:border-gold/70 hover:bg-gold/15"
+              >
+                <Mail className="h-4 w-4" aria-hidden />
+                {t('drawer.contact')}
+              </a>
+            </div>
           </motion.aside>
         </>
       )}
